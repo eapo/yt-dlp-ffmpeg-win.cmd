@@ -1,0 +1,7 @@
+tools/
+mcps/
+terminals/
+*.zip
+*.7z
+Thumbs.db
+Desktop.ini
