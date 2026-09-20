@@ -12,11 +12,10 @@ Portable Windows batch downloader for YouTube — paste a URL, pick a format, sa
 
 ## Total Commander
 
-Add to **Configuration → Options → Start Menu**:
+Add item under **Start → Change Start Menu**:
 
-```
-cmd.exe /c ""C:\Program Files\portable\yt-dl\yt-dl.cmd""
-```
+1. Command: `cmd.exe /c ""C:\Program Files\portable\yt-dl\yt-dl.cmd""`
+2. Parameters: `?%p` (optional)
 
 Adjust the path if you keep the script elsewhere.
 
