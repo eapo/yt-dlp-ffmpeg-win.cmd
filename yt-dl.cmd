@@ -6,6 +6,26 @@ REM CONFIG
 set "ROOT=%~dp0"
 set "TOOLS=%ROOT%tools\"
 set "YTDLP_URL=https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"
+
+REM ---------------------------------------------------------------------------
+REM OPTIONAL: override output directory via first argument
+REM ---------------------------------------------------------------------------
+if "%~1"=="" goto :EOF
+echo "Output to:" %~1
+
+set "ARG_OUT=%~1"
+for %%i in ("%ARG_OUT%") do set "ARG_OUT=%%~fi"
+
+if "%ARG_OUT%"=="" goto :EOF
+
+if not exist "%ARG_OUT%" mkdir "%ARG_OUT%"
+if not exist "%ARG_OUT%" (
+    call :UI_ERR "Could not create directory: %ARG_OUT%"
+    pause
+)
+
+set "OUT=%ARG_OUT%"
+
 call :RESOLVE_DOWNLOADS
 
 REM UI
@@ -63,7 +83,7 @@ REM ---------------------------------------------------------------------------
 echo.
 echo %ESC%[96m  Available formats for:%ESC%[0m !VID_URL!
 echo.
-"%TOOLS%yt-dlp.exe" --no-update -F "!VID_URL!"
+"%TOOLS%yt-dlp.exe" --js-runtimes node --no-update -F "!VID_URL!"
 if errorlevel 1 (
     call :UI_ERR "Could not list formats."
     exit /b 1
@@ -143,9 +163,9 @@ if "!MERGE_DL!"=="1" (
 )
 echo.
 if "!MERGE_DL!"=="1" (
-    "%TOOLS%yt-dlp.exe" --no-update --ffmpeg-location "!FFMPEG_LOC!" -f "!FMT_ID!" --merge-output-format mp4 -o "!OUT!\%%(title).200s [%%(id)s].%%(ext)s" "!VID_URL!"
+    "%TOOLS%yt-dlp.exe" --no-update --ffmpeg-location "!FFMPEG_LOC!" -f "!FMT_ID!" --merge-output-format mp4 -P "!OUT!" -o "%%(title).200s [%%(id)s].%%(ext)s" "!VID_URL!"
 ) else (
-    "%TOOLS%yt-dlp.exe" --no-update --ffmpeg-location "!FFMPEG_LOC!" -f "!FMT_ID!" -o "!OUT!\%%(title).200s [%%(id)s].%%(ext)s" "!VID_URL!"
+    "%TOOLS%yt-dlp.exe" --no-update --ffmpeg-location "!FFMPEG_LOC!" -f "!FMT_ID!" -P "!OUT!" -o "%%(title).200s [%%(id)s].%%(ext)s" "!VID_URL!"
 )
 if errorlevel 1 (
     call :UI_ERR "DOWNLOAD FAILED."
@@ -232,7 +252,7 @@ REM ---------------------------------------------------------------------------
 REM RESOLVE_DOWNLOADS
 REM ---------------------------------------------------------------------------
 :RESOLVE_DOWNLOADS
-set "OUT="
+REM set "OUT="
 set "RawPath="
 set "GUID={374DE290-123F-4565-9164-39C4925E467B}"
 for /f "tokens=2*" %%a in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /v "%GUID%" 2^>nul') do set "RawPath=%%b"
